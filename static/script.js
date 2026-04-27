@@ -1,168 +1,146 @@
 // CarbonTrack - JavaScript
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Theme Toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = themeToggle.querySelector('.theme-icon');
-    
-    // Check for saved theme preference or default to dark
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-    
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
-    });
-    
-    function updateThemeIcon(theme) {
-        themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+const categoryConfig = {
+    transport: {
+        subcategories: ["car_petrol", "bus", "train"],
+        label: "Distance (km)",
+        placeholder: "Enter km"
+    },
+    energy: {
+        subcategories: ["ac", "fan", "fridge", "tv", "laptop"],
+        label: "Usage Time (hours)",
+        placeholder: "Enter hours"
+    },
+    food: {
+        subcategories: ["beef", "chicken", "rice"],
+        label: "Weight (kg)",
+        placeholder: "Enter kg"
+    },
+    waste: {
+        subcategories: ["plastic", "paper", "general_waste"],
+        label: "Waste (kg)",
+        placeholder: "Enter kg"
     }
-    
-    // Activity Type Dropdown Logic
-    const categorySelect = document.getElementById('category');
-    const activityTypeSelect = document.getElementById('activity_type');
-    const unitSelect = document.getElementById('unit');
-    
-    // Define activity types for each category
-    const activityTypes = {
-        electricity: [
-            { value: 'fan', label: 'Fan', unit: 'hours' },
-            { value: 'ac', label: 'AC', unit: 'hours' },
-            { value: 'lights', label: 'Lights', unit: 'hours' },
-            { value: 'heater', label: 'Heater', unit: 'hours' },
-            { value: 'fridge', label: 'Fridge', unit: 'hours' },
-            { value: 'washing_machine', label: 'Washing Machine', unit: 'hours' },
-            { value: 'tv', label: 'TV', unit: 'hours' },
-            { value: 'computer', label: 'Computer', unit: 'hours' }
-        ],
-        transport: [
-            { value: 'car', label: 'Car', unit: 'km' },
-            { value: 'bus', label: 'Bus', unit: 'km' },
-            { value: 'train', label: 'Train', unit: 'km' },
-            { value: 'flight', label: 'Flight', unit: 'km' },
-            { value: 'bike', label: 'Bike', unit: 'km' },
-            { value: 'walk', label: 'Walk', unit: 'km' },
-            { value: 'taxi', label: 'Taxi', unit: 'km' },
-            { value: 'metro', label: 'Metro', unit: 'km' }
-        ],
-        food: [
-            { value: 'rice', label: 'Rice', unit: 'servings' },
-            { value: 'chicken', label: 'Chicken', unit: 'servings' },
-            { value: 'beef', label: 'Beef', unit: 'servings' },
-            { value: 'pork', label: 'Pork', unit: 'servings' },
-            { value: 'vegetables', label: 'Vegetables', unit: 'servings' },
-            { value: 'fruits', label: 'Fruits', unit: 'servings' },
-            { value: 'dairy', label: 'Dairy', unit: 'servings' }
-        ],
-        waste: [
-            { value: 'landfill', label: 'Landfill', unit: 'kg' },
-            { value: 'recycled', label: 'Recycled', unit: 'kg' },
-            { value: 'composted', label: 'Composted', unit: 'kg' }
-        ]
-    };
-    
-    // Update unit options based on category
-    const unitOptions = {
-        hours: [
-            { value: 'hours', label: 'Hours' }
-        ],
-        km: [
-            { value: 'km', label: 'Kilometers' }
-        ],
-        servings: [
-            { value: 'servings', label: 'Servings' },
-            { value: 'kg', label: 'Kilograms' }
-        ],
-        kg: [
-            { value: 'kg', label: 'Kilograms' }
-        ],
-        units: [
-            { value: 'units', label: 'Units' }
-        ]
-    };
-    
-    if (categorySelect && activityTypeSelect) {
-        categorySelect.addEventListener('change', function() {
-            const category = this.value;
-            
-            // Clear current options
-            activityTypeSelect.innerHTML = '<option value="">Select Activity</option>';
-            activityTypeSelect.disabled = true;
-            
-            if (category && activityTypes[category]) {
-                // Add new options based on category
-                activityTypes[category].forEach(function(activity) {
-                    const option = document.createElement('option');
-                    option.value = activity.value;
-                    option.textContent = activity.label;
-                    option.dataset.unit = activity.unit;
-                    activityTypeSelect.appendChild(option);
-                });
-                activityTypeSelect.disabled = false;
-            }
-            
-            // Reset unit select
-            if (unitSelect) {
-                unitSelect.innerHTML = '';
-                const defaultUnits = [
-                    { value: 'hours', label: 'Hours' },
-                    { value: 'km', label: 'Kilometers' },
-                    { value: 'servings', label: 'Servings' },
-                    { value: 'kg', label: 'Kilograms' },
-                    { value: 'units', label: 'Units' }
-                ];
-                defaultUnits.forEach(function(unit) {
-                    const option = document.createElement('option');
-                    option.value = unit.value;
-                    option.textContent = unit.label;
-                    unitSelect.appendChild(option);
-                });
-            }
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    const themeToggle = document.getElementById("theme-toggle");
+    const category = document.getElementById("category");
+    const subcategory = document.getElementById("subcategory");
+    const inputLabel = document.getElementById("inputLabel");
+    const valueInput = document.getElementById("valueInput");
+    const modeGroup = document.getElementById("modeGroup");
+    const modeToggle = document.getElementById("modeToggle");
+
+    if (themeToggle) {
+        const themeIcon = themeToggle.querySelector(".theme-icon");
+        const savedTheme = localStorage.getItem("theme") || "dark";
+
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener("click", function() {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            updateThemeIcon(newTheme);
         });
-        
-        // Auto-update unit when activity type is selected
-        activityTypeSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const defaultUnit = selectedOption.dataset.unit;
-            
-            if (defaultUnit && unitSelect) {
-                // Update unit dropdown with relevant options
-                unitSelect.innerHTML = '';
-                const options = unitOptions[defaultUnit] || unitOptions.units;
-                options.forEach(function(unit) {
-                    const option = document.createElement('option');
-                    option.value = unit.value;
-                    option.textContent = unit.label;
-                    unitSelect.appendChild(option);
-                });
+
+        function updateThemeIcon(theme) {
+            if (themeIcon) {
+                themeIcon.textContent = theme === "dark" ? "Moon" : "Sun";
             }
+        }
+    }
+
+    function formatOption(value) {
+        return value
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, function(character) {
+                return character.toUpperCase();
+            });
+    }
+
+    function updateSubcategories() {
+        if (!category || !subcategory) {
+            return;
+        }
+
+        const config = categoryConfig[category.value];
+        subcategory.innerHTML = "";
+
+        config.subcategories.forEach(function(item) {
+            const option = document.createElement("option");
+            option.value = item;
+            option.textContent = formatOption(item);
+            subcategory.appendChild(option);
         });
     }
-    
-    // Set default date to today
-    const manualDateInput = document.getElementById('manual_date');
-    if (manualDateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        manualDateInput.max = today;
+
+    function updateInputState() {
+        if (!category || !inputLabel || !valueInput || !modeGroup || !modeToggle) {
+            return;
+        }
+
+        const config = categoryConfig[category.value];
+        const servingsMode = category.value === "food" && modeToggle.value === "servings";
+
+        modeGroup.style.display = category.value === "food" ? "block" : "none";
+        inputLabel.textContent = servingsMode ? "Servings" : config.label;
+        valueInput.placeholder = servingsMode ? "Enter servings" : config.placeholder;
+        valueInput.value = "";
     }
-    
-    // Form validation
-    const activityForm = document.querySelector('.activity-form');
-    if (activityForm) {
-        activityForm.addEventListener('submit', function(e) {
-            const category = document.getElementById('category').value;
-            const activityType = document.getElementById('activity_type').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            
-            if (!category || !activityType || !amount || amount <= 0) {
-                e.preventDefault();
-                alert('Please fill in all fields correctly.');
-            }
+
+    if (category && subcategory && inputLabel && valueInput) {
+        category.addEventListener("change", function() {
+            updateSubcategories();
+            updateInputState();
         });
+
+        if (modeToggle) {
+            modeToggle.addEventListener("change", updateInputState);
+        }
+
+        updateSubcategories();
+        updateInputState();
     }
 });
+
+function addActivity(event) {
+    event.preventDefault();
+
+    const category = document.getElementById("category").value;
+    const type = document.getElementById("subcategory").value;
+    const amount = document.getElementById("valueInput").value;
+    const modeToggle = document.getElementById("modeToggle");
+
+    let finalAmount = parseFloat(amount);
+
+    if (category === "food" && modeToggle && modeToggle.value === "servings") {
+        finalAmount = finalAmount * 0.25;
+    }
+
+    if (!type || !finalAmount || finalAmount <= 0) {
+        alert("Please fill in all fields correctly.");
+        return;
+    }
+
+    fetch("/add", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            type: type,
+            amount: finalAmount,
+            date: new Date().toISOString()
+        })
+    }).then(function(response) {
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+
+        window.location.reload();
+    });
+}

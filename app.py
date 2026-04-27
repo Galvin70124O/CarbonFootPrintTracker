@@ -208,17 +208,19 @@ def dashboard():
 @app.route("/add", methods=["POST"])
 @login_required
 def add_activity():
-    category = request.form.get("category")
-    activity_type = request.form.get("activity_type")
-    amount = float(request.form.get("amount", 0))
-    unit = request.form.get("unit")
-    manual_date = request.form.get("manual_date")
+    data = request.get_json()
+    t = data["type"]
+    print("TYPE RECEIVED:", t)
+
+    amt = float(data.get("amount", 0))
+    manual_date = data.get("date")
     
-    if not category or not activity_type or amount <= 0:
+    if not t or amt <= 0:
         flash("Please fill in all fields correctly", "error")
         return redirect("/dashboard")
     
-    emission = calculate_emission(category, activity_type, amount, unit)
+    factors = load_emission_factors()
+    emission = amt * factors.get(t, 0)
     
     # Use manual date if provided, otherwise use current date
     activity_date = manual_date if manual_date else datetime.now().strftime("%Y-%m-%d")
@@ -227,7 +229,7 @@ def add_activity():
     conn.execute("""
         INSERT INTO activities (user_id, category, activity_type, amount, unit, emission, date, manual_date)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (session["user_id"], category, activity_type, amount, unit, emission, activity_date, manual_date))
+    """, (session["user_id"], t, t, amt, "units", emission, activity_date, manual_date))
     conn.commit()
     conn.close()
     
