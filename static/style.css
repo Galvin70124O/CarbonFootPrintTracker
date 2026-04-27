@@ -12,7 +12,7 @@
     --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.34);
     --shadow-card: 0 22px 55px rgba(2, 6, 23, 0.28);
     --glow: 0 0 0 4px rgba(59, 130, 246, 0.18);
-    --radius-card: 16px;
+    --radius-card: 18px;
     --radius-input: 10px;
     --transition: 180ms ease;
 }
@@ -44,9 +44,10 @@ a {
 }
 
 .container {
-    width: min(900px, calc(100% - 32px));
+    width: 100%;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 28px 0 40px;
+    padding: 30px;
 }
 
 .navbar {
@@ -188,8 +189,8 @@ a {
 .workspace-grid,
 .main-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: 20px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 25px;
 }
 
 .workspace-card,
@@ -203,7 +204,8 @@ a {
 .day-card,
 .landing-section,
 .activity-item {
-    padding: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
 }
 
 .panel-header {
@@ -211,7 +213,7 @@ a {
     align-items: flex-start;
     justify-content: space-between;
     gap: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .panel-header h2,
@@ -220,9 +222,9 @@ a {
 .dashboard-header h1,
 .auth-header h1,
 .landing-header h1 {
-    font-size: 1.35rem;
-    line-height: 1.15;
-    letter-spacing: -0.03em;
+    font-size: 1.6rem;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
 }
 
 .panel-header p,
@@ -233,17 +235,17 @@ a {
 .no-insights,
 .no-activities {
     color: var(--text-secondary);
-    font-size: 0.94rem;
+    font-size: 0.98rem;
 }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 0.82rem;
+    margin-bottom: 9px;
+    font-size: 0.84rem;
     font-weight: 600;
     color: var(--text-secondary);
 }
@@ -251,7 +253,8 @@ a {
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 12px;
+    min-height: 52px;
+    padding: 14px 16px;
     font: inherit;
     color: var(--text-primary);
     background: #0f172a;
@@ -334,16 +337,16 @@ a {
 .activities-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
 }
 
 .feed-item,
 .activity-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px;
+    gap: 18px;
+    padding: 20px;
     background: rgba(15, 23, 42, 0.86);
     border: 1px solid rgba(51, 65, 85, 0.88);
     border-radius: 14px;
@@ -352,9 +355,13 @@ a {
 .feed-main,
 .activity-info {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 10px;
     min-width: 0;
+}
+
+.activity-info {
+    flex-direction: column;
 }
 
 .feed-icon,
@@ -392,6 +399,15 @@ a {
     font-size: 0.84rem;
 }
 
+.activity-type {
+    font-size: 1rem;
+}
+
+.activity-amount,
+.activity-date {
+    font-size: 0.88rem;
+}
+
 .feed-value {
     color: var(--accent);
     font-weight: 700;
@@ -406,7 +422,7 @@ a {
 .weekly-grid,
 .features {
     display: grid;
-    gap: 14px;
+    gap: 20px;
 }
 
 .mini-stat-row {
@@ -434,11 +450,11 @@ a {
 
 .summary-cards,
 .stats-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .dashboard {
-    padding: 10px 0 20px;
+    padding: 8px 0 30px;
 }
 
 .dashboard-header,
@@ -446,11 +462,93 @@ a {
 .auth-header,
 .section-title,
 .insights-section {
-    margin-bottom: 18px;
+    margin-bottom: 22px;
 }
 
 .card-title {
-    margin-bottom: 16px;
+    margin-bottom: 0;
+}
+
+.card-heading,
+.section-heading {
+    margin-bottom: 22px;
+}
+
+.dashboard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.dashboard-header-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dashboard-header h1 {
+    font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.summary-cards {
+    margin-top: 22px;
+    margin-bottom: 8px;
+}
+
+.summary-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-height: 138px;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.card-label {
+    margin-bottom: 0;
+}
+
+.card-value {
+    font-size: 1.6rem;
+    line-height: 1.15;
+}
+
+.status-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+.main-grid {
+    margin-top: 30px;
+    align-items: start;
+}
+
+.form-card,
+.list-card,
+.insight-card {
+    min-height: 100%;
+}
+
+.activity-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.activity-form .btn {
+    margin-top: 12px;
+}
+
+#modeGroup {
+    padding-top: 4px;
+    margin-top: 4px;
 }
 
 .activity-category {
@@ -473,9 +571,16 @@ a {
     gap: 12px;
 }
 
+.activity-right {
+    justify-content: flex-end;
+    align-self: stretch;
+}
+
 .activity-emission {
     flex-direction: column;
     align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-delete {
@@ -513,7 +618,7 @@ a {
 .weekly-bars {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 18px;
 }
 
 .bar-label,
@@ -530,13 +635,15 @@ a {
 .bar-label {
     justify-content: space-between;
     color: var(--text-secondary);
-    font-size: 0.84rem;
+    font-size: 0.9rem;
 }
 
 .weekly-bars {
-    height: 180px;
+    min-height: 240px;
     flex-direction: row;
     align-items: flex-end;
+    gap: 16px;
+    padding-top: 14px;
 }
 
 .weekly-bar-item {
@@ -545,16 +652,17 @@ a {
     align-items: flex-end;
     flex-direction: column;
     justify-content: flex-end;
+    gap: 10px;
 }
 
 .weekly-bar {
     width: 100%;
-    min-height: 8px;
+    min-height: 12px;
 }
 
 .weekly-label {
     color: var(--text-secondary);
-    font-size: 0.74rem;
+    font-size: 0.8rem;
 }
 
 .auth-page {
@@ -610,11 +718,19 @@ a {
 
 .no-activities,
 .no-insights {
-    padding: 20px;
+    padding: 28px 24px;
     text-align: center;
     border: 1px dashed rgba(51, 65, 85, 0.95);
     border-radius: 14px;
     background: rgba(15, 23, 42, 0.68);
+}
+
+.insights-section {
+    margin-top: 38px;
+}
+
+.insight-card {
+    min-height: 280px;
 }
 
 @media (max-width: 960px) {
@@ -623,6 +739,11 @@ a {
     .summary-cards,
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .hero-panel,
@@ -644,8 +765,7 @@ a {
 
 @media (max-width: 640px) {
     .container {
-        width: min(100% - 20px, 900px);
-        padding-top: 22px;
+        padding: 22px 20px 30px;
     }
 
     .navbar {
@@ -662,7 +782,7 @@ a {
     .feature-card,
     .landing-section,
     .activity-item {
-        padding: 16px;
+        padding: 18px;
     }
 
     .page-title {
@@ -671,13 +791,19 @@ a {
 
     .feed-item,
     .activity-item {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         align-items: flex-start;
     }
 
     .feed-value,
-    .activity-emission {
+    .activity-emission,
+    .activity-right {
         align-items: flex-start;
+    }
+
+    .activity-right {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .mini-stat-row,

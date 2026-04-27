@@ -29,8 +29,10 @@
 
         <div class="dashboard">
             <div class="dashboard-header">
-                <h1>Dashboard</h1>
-                <p class="welcome-text">Welcome, {{ username }}</p>
+                <div class="dashboard-header-copy">
+                    <h1>Dashboard</h1>
+                    <p class="welcome-text">Welcome, {{ username }}</p>
+                </div>
             </div>
 
             <!-- Summary Cards -->
@@ -62,7 +64,9 @@
             <div class="main-grid">
                 <!-- Add Activity Form -->
                 <div class="card form-card">
-                    <h2 class="card-title">Add Activity</h2>
+                    <div class="card-heading">
+                        <h2 class="card-title">Add Activity</h2>
+                    </div>
                     <form class="activity-form" onsubmit="addActivity(event)">
                         <div class="form-group">
                             <label for="category">Category</label>
@@ -98,7 +102,9 @@
 
                 <!-- Activity List -->
                 <div class="card list-card">
-                    <h2 class="card-title">Recent Activities</h2>
+                    <div class="card-heading">
+                        <h2 class="card-title">Recent Activities</h2>
+                    </div>
                     <div class="activities-list" id="list">
                         {% if activities %}
                             {% for activity in activities %}
@@ -130,12 +136,17 @@
 
             <!-- Insights Section -->
             <div class="insights-section">
-                <h2 class="section-title">Insights</h2>
+                <div class="section-heading">
+                    <h2 class="section-title">Insights</h2>
+                </div>
                 
-                {% if category_breakdown %}
+                {% if category_breakdown or weekly_data %}
                 <div class="insights-grid">
+                    {% if category_breakdown %}
                     <div class="card insight-card">
-                        <h3 class="insight-title">By Category</h3>
+                        <div class="card-heading">
+                            <h3 class="insight-title">By Category</h3>
+                        </div>
                         <div class="category-bars">
                             {% for cat in category_breakdown %}
                             <div class="category-bar-item">
@@ -150,11 +161,13 @@
                             {% endfor %}
                         </div>
                     </div>
-                {% endif %}
+                    {% endif %}
 
-                {% if weekly_data %}
+                    {% if weekly_data %}
                     <div class="card insight-card">
-                        <h3 class="insight-title">Weekly Trend</h3>
+                        <div class="card-heading">
+                            <h3 class="insight-title">Weekly Trend</h3>
+                        </div>
                         <div class="weekly-bars">
                             {% for day in weekly_data %}
                             <div class="weekly-bar-item">
@@ -164,14 +177,13 @@
                             {% endfor %}
                         </div>
                     </div>
-                {% endif %}
-                
-                {% if not category_breakdown and not weekly_data %}
+                    {% endif %}
+                </div>
+                {% else %}
                     <div class="card insight-card">
                         <p class="no-insights">Start logging activities to see insights!</p>
                     </div>
                 {% endif %}
-                </div>
             </div>
         </div>
     </main>

@@ -113,16 +113,17 @@ function addActivity(event) {
 
     const category = document.getElementById("category").value;
     const type = document.getElementById("subcategory").value;
-    const amount = document.getElementById("valueInput").value;
+    const rawAmount = document.getElementById("valueInput").value;
     const modeToggle = document.getElementById("modeToggle");
+    const mode = modeToggle ? modeToggle.value : "";
 
-    let finalAmount = parseFloat(amount);
+    let amount = Number.parseFloat(rawAmount);
 
-    if (category === "food" && modeToggle && modeToggle.value === "servings") {
-        finalAmount = finalAmount * 0.25;
+    if (category === "food" && mode === "servings") {
+        amount = amount * 0.25;
     }
 
-    if (!type || !finalAmount || finalAmount <= 0) {
+    if (!type || !Number.isFinite(amount) || amount <= 0) {
         alert("Please fill in all fields correctly.");
         return;
     }
@@ -132,7 +133,7 @@ function addActivity(event) {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             type: type,
-            amount: finalAmount,
+            amount: amount,
             date: new Date().toISOString()
         })
     }).then(function(response) {
