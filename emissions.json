@@ -1,0 +1,57 @@
+{
+    "electricity": {
+        "fan": 0.00005,
+        "ac": 0.0008,
+        "lights": 0.00006,
+        "heater": 0.0007,
+        "fridge": 0.00015,
+        "washing_machine": 0.00012,
+        "tv": 0.00008,
+        "computer": 0.00006
+    },
+    "transport": {
+        "car": 0.00019,
+        "bus": 0.00008,
+        "train": 0.00004,
+        "flight": 0.00025,
+        "bike": 0,
+        "walk": 0,
+        "taxi": 0.00021,
+        "metro": 0.00005
+    },
+    "food": {
+        "rice": {
+            "per_serving": 0.0012,
+            "per_kg": 1.2
+        },
+        "chicken": {
+            "per_serving": 0.0045,
+            "per_kg": 4.5
+        },
+        "beef": {
+            "per_serving": 0.015,
+            "per_kg": 15
+        },
+        "pork": {
+            "per_serving": 0.007,
+            "per_kg": 7
+        },
+        "vegetables": {
+            "per_serving": 0.0002,
+            "per_kg": 0.2
+        },
+        "fruits": {
+            "per_serving": 0.00015,
+            "per_kg": 0.15
+        },
+        "dairy": {
+            "per_serving": 0.001,
+            "per_kg": 1
+        }
+    },
+    "waste": {
+        "landfill": 0.0005,
+        "recycled": 0.0001,
+        "composted": 0.00005
+    }
+}

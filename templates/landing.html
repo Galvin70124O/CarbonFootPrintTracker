@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - CarbonTrack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .landing-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .landing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .landing-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+        .landing-subtitle {
+            color: #94a3b8;
+            font-size: 1.125rem;
+        }
+        .landing-section {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .landing-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        .landing-section p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        .landing-list {
+            list-style: none;
+            padding: 0;
+        }
+        .landing-list li {
+            color: #94a3b8;
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .landing-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+        }
+        .landing-list li strong {
+            color: #e2e8f0;
+        }
+        .tracking-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .category-item {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .category-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+        .category-item p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+        .landing-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('index') }}">CarbonTrack</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Home</a>
+            {% if is_authenticated %}
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="landing-container">
+            <div class="landing-header">
+                <h1>About CarbonTrack</h1>
+                <p class="landing-subtitle">Your personal carbon footprint monitoring tool</p>
+            </div>
+
+            <div class="landing-section">
+                <h2>What is CarbonTrack?</h2>
+                <p>CarbonTrack helps you monitor and understand your daily carbon emissions. Just like tracking calories for health, CarbonTrack lets you track the environmental impact of your daily activities.</p>
+            </div>
+
+            <div class="landing-section">
+                <h2>How It Works</h2>
+                <ul class="landing-list">
+                    <li><strong>Create an account</strong> - Register to start tracking your emissions</li>
+                    <li><strong>Log activities</strong> - Record your transportation, energy usage, and food consumption</li>
+                    <li><strong>View insights</strong> - See detailed breakdowns of your carbon footprint</li>
+                    <li><strong>Get recommendations</strong> - Receive personalized tips to reduce your impact</li>
+                </ul>
+            </div>
+
+            <div class="landing-section">
+                <h2>What We Track</h2>
+                <div class="tracking-categories">
+                    <div class="category-item">
+                        <h3>⚡ Electricity</h3>
+                        <p>Fan, AC, lights, heater, fridge, and more</p>
+                    </div>
+                    <div class="category-item">
+                        <h3>🚗 Transportation</h3>
+                        <p>Car, bus, train, flight, bike, and walking</p>
+                    </div>
+                    <div class="category-item">
+                        <h3>🍽️ Food</h3>
+                        <p>Rice, chicken, beef, pork, vegetables, and fruits</p>
+                    </div>
+                    <div class="category-item">
+                        <h3>🗑️ Waste</h3>
+                        <p>Landfill, recycled, and composted waste</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="landing-cta">
+                {% if is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
