@@ -1,0 +1,19 @@
+<ul class="activity-list">
+    {% for a in (activities if activities is defined else recent) %}
+    <li class="activity">
+        <span class="cat-dot cat-{{ a.category }}" aria-hidden="true"></span>
+        <div class="activity-main">
+            <strong>{{ a.label }}</strong>
+            <span class="muted">{{ a.date_label }} · {{ '%g'|format(a.amount) }} {{ a.unit }} · {{ a.category_label }}</span>
+        </div>
+        <span class="activity-kg">{{ '%.2f'|format(a.emission) }} kg</span>
+        <form method="POST" action="{{ url_for('delete_activity', activity_id=a.id) }}" class="inline-form" data-confirm="Delete this activity?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="next" value="{{ request.full_path }}">
+            <button type="submit" class="icon-button danger" aria-label="Delete {{ a.label }} on {{ a.date }}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>

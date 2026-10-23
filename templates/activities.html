@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Activities{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Activities</h1>
+        <p class="muted">{{ activities|length }} entries · {{ '%.2f'|format(total) }} kg CO₂e</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{{ url_for('export_csv') }}">Export CSV</a>
+</div>
+
+<nav class="filters" aria-label="Filter by category">
+    <a href="{{ url_for('activities') }}" class="chip {{ 'active' if not selected }}">All</a>
+    {% for key, cat in categories.items() %}
+        <a href="{{ url_for('activities', category=key) }}" class="chip {{ 'active' if selected == key }}">
+            <span class="cat-dot cat-{{ key }}" aria-hidden="true"></span>{{ cat.label }}
+        </a>
+    {% endfor %}
+</nav>
+
+<section class="card">
+    {% if activities %}
+        {% include "_activity_list.html" %}
+    {% else %}
+        <p class="empty">No activities here yet. <a href="{{ url_for('dashboard') }}">Add one</a>.</p>
+    {% endif %}
+</section>
+{% endblock %}

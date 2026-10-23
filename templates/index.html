@@ -1,163 +1,36 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carbon Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="{{ url_for('index') }}">Carbon Tracker</a>
-        </div>
-        <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            {% if is_authenticated %}
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-            {% endif %}
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}Track your carbon footprint{% endblock %}
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">Personal carbon tracker</span>
+    <h1>See where your CO₂ comes from, one day at a time.</h1>
+    <p class="lead">Log trips, appliance use, meals and waste. CarbonTrack turns them into kg of CO₂e, compares you with the India per-person average and tracks a monthly goal.</p>
+    <div class="hero-actions">
+        {% if is_authenticated %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Open dashboard</a>
+        {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Create a free account</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">Log in</a>
+        {% endif %}
+    </div>
+</section>
 
-    <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+<section class="feature-grid">
+    {% for key, cat in categories.items() %}
+    <article class="card feature">
+        <span class="cat-dot cat-{{ key }}" aria-hidden="true"></span>
+        <h2>{{ cat.label }}</h2>
+        <p>{{ cat['items'].values()|map(attribute='label')|list|join(', ') }}</p>
+    </article>
+    {% endfor %}
+</section>
 
-        <section class="hero-panel card surface-enter">
-            <div class="hero-copy">
-                <span class="eyebrow">Carbon intelligence</span>
-                <h1 class="page-title">Track emissions with a cleaner, faster workflow.</h1>
-                <p class="page-subtitle">Log transport, energy, food, and waste in one polished flow, then move into your dashboard for deeper tracking and insights.</p>
-            </div>
-            <div class="hero-actions">
-                {% if is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Open Dashboard</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}" class="btn btn-primary">Sign In</a>
-                    <a href="{{ url_for('register') }}" class="btn btn-secondary">Create Account</a>
-                {% endif %}
-            </div>
-        </section>
-
-        <section class="workspace-grid">
-            <article class="card workspace-card surface-enter">
-                <div class="panel-header">
-                    <div>
-                        <span class="panel-kicker">Quick entry</span>
-                        <h2>Log Activity</h2>
-                    </div>
-                    <p>Structured inputs keep every entry tidy and consistent.</p>
-                </div>
-
-                <form class="activity-form" onsubmit="addActivity(event)">
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" name="category" required>
-                            <option value="transport">transport</option>
-                            <option value="energy">energy</option>
-                            <option value="food">food</option>
-                            <option value="waste">waste</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subcategory">Subcategory</label>
-                        <select id="subcategory" name="subcategory" required></select>
-                    </div>
-
-                    <div class="form-group" id="modeGroup" style="display: none;">
-                        <label for="modeToggle">Food Mode</label>
-                        <select id="modeToggle" name="modeToggle">
-                            <option value="weight">weight</option>
-                            <option value="servings">servings</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="valueInput" id="inputLabel">Distance (km)</label>
-                        <input type="number" id="valueInput" name="valueInput" step="0.01" min="0.01" required placeholder="Enter km">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-full">Add Activity</button>
-                </form>
-            </article>
-
-            <aside class="card workspace-card surface-enter">
-                <div class="panel-header">
-                    <div>
-                        <span class="panel-kicker">Activity list</span>
-                        <h2>Reference Feed</h2>
-                    </div>
-                    <p>Representative emission factors for the most common entries.</p>
-                </div>
-
-                <div class="activity-feed">
-                    <div class="feed-item">
-                        <div class="feed-main">
-                            <span class="feed-icon">C</span>
-                            <div class="feed-copy">
-                                <strong>Car Petrol</strong>
-                                <span>Transport baseline</span>
-                            </div>
-                        </div>
-                        <span class="feed-value">0.00019</span>
-                    </div>
-
-                    <div class="feed-item">
-                        <div class="feed-main">
-                            <span class="feed-icon">A</span>
-                            <div class="feed-copy">
-                                <strong>AC Usage</strong>
-                                <span>Hourly energy input</span>
-                            </div>
-                        </div>
-                        <span class="feed-value">hours</span>
-                    </div>
-
-                    <div class="feed-item">
-                        <div class="feed-main">
-                            <span class="feed-icon">B</span>
-                            <div class="feed-copy">
-                                <strong>Beef Intake</strong>
-                                <span>Weight or serving mode</span>
-                            </div>
-                        </div>
-                        <span class="feed-value">0.25 kg</span>
-                    </div>
-
-                    <div class="feed-item">
-                        <div class="feed-main">
-                            <span class="feed-icon">W</span>
-                            <div class="feed-copy">
-                                <strong>General Waste</strong>
-                                <span>Waste category tracking</span>
-                            </div>
-                        </div>
-                        <span class="feed-value">kg</span>
-                    </div>
-                </div>
-
-                <div class="mini-stat-row">
-                    <div class="mini-stat">
-                        <span class="mini-stat-label">Categories</span>
-                        <strong>4</strong>
-                    </div>
-                    <div class="mini-stat">
-                        <span class="mini-stat-label">Modes</span>
-                        <strong>Smart</strong>
-                    </div>
-                </div>
-            </aside>
-        </section>
-    </main>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+<section class="card how">
+    <h2>How it works</h2>
+    <ol class="steps">
+        <li><strong>Log an activity.</strong> Pick a category, an item and an amount (km, hours, kg or servings).</li>
+        <li><strong>Get the emission.</strong> Each item has an emission factor; energy uses appliance power × hours × India's grid factor.</li>
+        <li><strong>Watch the trend.</strong> 30-day chart, category split, monthly goal and a CSV export of everything.</li>
+    </ol>
+</section>
+{% endblock %}

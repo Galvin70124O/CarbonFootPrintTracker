@@ -1,16 +1,69 @@
 {
-    "car_petrol": 0.19,
-    "bus": 0.08,
-    "train": 0.04,
-    "ac": 0.8,
-    "fan": 0.05,
-    "fridge": 0.15,
-    "tv": 0.09,
-    "laptop": 0.06,
-    "beef": 15.0,
-    "chicken": 4.5,
-    "rice": 1.2,
-    "plastic": 6.0,
-    "paper": 1.3,
-    "general_waste": 0.7
+    "_about": "Approximate emission factors in kg CO2e. Sources are listed in README.md. Energy items are appliance power (kW) x hours x the grid factor.",
+    "grid_kg_per_kwh": 0.72,
+    "india_avg_tonnes_per_year": 2.2,
+    "categories": {
+        "transport": {
+            "label": "Transport",
+            "unit": "km",
+            "input_label": "Distance (km)",
+            "items": {
+                "car_petrol": {"label": "Car (petrol)", "factor": 0.17},
+                "car_diesel": {"label": "Car (diesel)", "factor": 0.17},
+                "two_wheeler": {"label": "Bike / scooter", "factor": 0.05},
+                "auto_rickshaw": {"label": "Auto rickshaw", "factor": 0.07},
+                "bus": {"label": "Bus", "factor": 0.08},
+                "metro": {"label": "Metro", "factor": 0.03},
+                "train": {"label": "Train", "factor": 0.04},
+                "flight": {"label": "Flight (domestic)", "factor": 0.25},
+                "bicycle": {"label": "Bicycle / walk", "factor": 0.0}
+            }
+        },
+        "energy": {
+            "label": "Energy",
+            "unit": "hours",
+            "input_label": "Usage time (hours)",
+            "items": {
+                "ac": {"label": "Air conditioner", "power_kw": 1.5},
+                "fan": {"label": "Ceiling fan", "power_kw": 0.075},
+                "fridge": {"label": "Fridge (average draw)", "power_kw": 0.06},
+                "tv": {"label": "TV", "power_kw": 0.1},
+                "laptop": {"label": "Laptop", "power_kw": 0.05},
+                "desktop_pc": {"label": "Gaming / desktop PC", "power_kw": 0.4},
+                "geyser": {"label": "Water heater (geyser)", "power_kw": 2.0},
+                "electricity_kwh": {"label": "Electricity (kWh from bill)", "unit": "kWh", "input_label": "Electricity used (kWh)", "power_kw": 1.0}
+            }
+        },
+        "food": {
+            "label": "Food",
+            "unit": "kg",
+            "input_label": "Weight (kg)",
+            "servings": true,
+            "items": {
+                "beef": {"label": "Beef", "factor": 99.5, "serving_kg": 0.15},
+                "mutton": {"label": "Mutton / lamb", "factor": 39.7, "serving_kg": 0.15},
+                "chicken": {"label": "Chicken", "factor": 9.9, "serving_kg": 0.15},
+                "fish": {"label": "Fish (farmed)", "factor": 13.6, "serving_kg": 0.15},
+                "eggs": {"label": "Eggs", "factor": 4.7, "serving_kg": 0.1},
+                "paneer_cheese": {"label": "Paneer / cheese", "factor": 23.9, "serving_kg": 0.05},
+                "milk": {"label": "Milk", "factor": 3.2, "serving_kg": 0.25},
+                "rice": {"label": "Rice", "factor": 4.5, "serving_kg": 0.15},
+                "wheat": {"label": "Wheat / roti", "factor": 1.6, "serving_kg": 0.1},
+                "pulses": {"label": "Dal / pulses", "factor": 1.8, "serving_kg": 0.1},
+                "vegetables": {"label": "Vegetables", "factor": 0.5, "serving_kg": 0.15}
+            }
+        },
+        "waste": {
+            "label": "Waste",
+            "unit": "kg",
+            "input_label": "Waste (kg)",
+            "items": {
+                "general_waste": {"label": "General waste (landfill)", "factor": 0.7},
+                "plastic": {"label": "Plastic", "factor": 6.0},
+                "paper": {"label": "Paper", "factor": 1.3},
+                "food_waste": {"label": "Food waste", "factor": 0.6},
+                "recycled": {"label": "Recycled (sorted)", "factor": 0.1}
+            }
+        }
+    }
 }
