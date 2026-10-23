@@ -1,193 +1,137 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - CarbonTrack</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="{{ url_for('index') }}">CarbonTrack</a>
-        </div>
-        <div class="nav-links">
-            <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="muted">Hi {{ username }}. All figures are kg CO₂e.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{{ url_for('export_csv') }}">Export CSV</a>
+</div>
 
-    <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">{{ message }}</div>
-                {% endfor %}
+<section class="stat-grid" aria-label="Summary">
+    <div class="card stat">
+        <span class="stat-label">{{ stats.month_name }} so far</span>
+        <span class="stat-value">{{ '%.1f'|format(stats.month_total) }}<small> kg</small></span>
+        {% if stats.goal %}
+            <div class="meter {{ 'over' if stats.goal_pct > 100 }}" role="progressbar" aria-valuenow="{{ stats.goal_pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="Monthly goal used">
+                <span style="width: {{ [stats.goal_pct, 100]|min }}%"></span>
+            </div>
+            <span class="stat-sub">{{ stats.goal_pct }}% of your {{ '%g'|format(stats.goal) }} kg goal</span>
+        {% else %}
+            <span class="stat-sub">No monthly goal set</span>
+        {% endif %}
+    </div>
+    <div class="card stat">
+        <span class="stat-label">Last 7 days</span>
+        <span class="stat-value">{{ '%.1f'|format(stats.week_total) }}<small> kg</small></span>
+        <span class="stat-sub">{{ stats.count }} activities logged in total</span>
+    </div>
+    <div class="card stat">
+        <span class="stat-label">Daily average</span>
+        <span class="stat-value">{{ '%.1f'|format(stats.daily_avg) }}<small> kg/day</small></span>
+        {% if stats.vs_india_pct is not none %}
+            <span class="stat-sub {{ 'good' if stats.vs_india_pct < 100 else 'bad' }}">{{ stats.vs_india_pct }}% of India's average ({{ stats.india_daily }} kg/day)</span>
+        {% else %}
+            <span class="stat-sub">India average: {{ stats.india_daily }} kg/day</span>
+        {% endif %}
+    </div>
+</section>
+
+<div class="dash-grid">
+    <section class="card" aria-labelledby="add-title">
+        <h2 id="add-title">Add activity</h2>
+        <form method="POST" action="{{ url_for('add_activity') }}" class="stack" id="activity-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    {% for key, cat in categories.items() %}
+                        <option value="{{ key }}">{{ cat.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="activity_type">Activity</label>
+                <select id="activity_type" name="activity_type" required></select>
+            </div>
+            <div class="field" id="mode-field" hidden>
+                <span class="label">Measure by</span>
+                <div class="segmented" role="radiogroup">
+                    <label><input type="radio" name="mode" value="weight" checked> Weight</label>
+                    <label><input type="radio" name="mode" value="servings"> Servings</label>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label for="amount" id="amount-label">Distance (km)</label>
+                    <input type="number" id="amount" name="amount" step="any" min="0.01" required inputmode="decimal">
+                </div>
+                <div class="field">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" value="{{ today }}" max="{{ today }}" required>
+                </div>
+            </div>
+            <p class="preview muted" id="preview" aria-live="polite"></p>
+            <button type="submit" class="btn btn-primary btn-full">Add activity</button>
+        </form>
+    </section>
+
+    <section class="card" aria-labelledby="recent-title">
+        <div class="card-head">
+            <h2 id="recent-title">Recent activities</h2>
+            <a href="{{ url_for('activities') }}" class="link">See all</a>
+        </div>
+        {% if recent %}
+            {% include "_activity_list.html" %}
+        {% else %}
+            <p class="empty">Nothing logged yet. Add your first activity on the left.</p>
+        {% endif %}
+    </section>
+</div>
+
+<section id="insights" class="insights">
+    <h2>Insights · last 30 days</h2>
+    <div class="dash-grid">
+        <div class="card chart-card">
+            <h3>Daily emissions</h3>
+            <div class="chart-box"><canvas id="daily-chart" aria-label="Daily emissions over the last 30 days"></canvas></div>
+        </div>
+        <div class="card chart-card">
+            <h3>By category</h3>
+            {% if stats.chart.categoryValues|sum > 0 %}
+                <div class="chart-box"><canvas id="category-chart" aria-label="Emissions by category"></canvas></div>
+            {% else %}
+                <p class="empty">No data in the last 30 days.</p>
             {% endif %}
-        {% endwith %}
-
-        <div class="dashboard">
-            <div class="dashboard-header">
-                <div class="dashboard-header-copy">
-                    <h1>Dashboard</h1>
-                    <p class="welcome-text">Welcome, {{ username }}</p>
-                </div>
-            </div>
-
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="card-icon">🌍</div>
-                    <div class="card-content">
-                        <span class="card-label">Total Emissions</span>
-                        <span class="card-value" id="total">{{ total_emission }} kg CO₂</span>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="card-icon">📊</div>
-                    <div class="card-content">
-                        <span class="card-label">Activities Logged</span>
-                        <span class="card-value" id="count">{{ activities|length }}</span>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="card-icon">💡</div>
-                    <div class="card-content">
-                        <span class="card-label">Status</span>
-                        <span class="card-value status-text">{{ recommendation }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Grid -->
-            <div class="main-grid">
-                <!-- Add Activity Form -->
-                <div class="card form-card">
-                    <div class="card-heading">
-                        <h2 class="card-title">Add Activity</h2>
-                    </div>
-                    <form class="activity-form" onsubmit="addActivity(event)">
-                        <div class="form-group">
-                            <label for="category">Category</label>
-                            <select id="category" name="category" required>
-                                <option value="transport">transport</option>
-                                <option value="energy">energy</option>
-                                <option value="food">food</option>
-                                <option value="waste">waste</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="subcategory">Subcategory</label>
-                            <select id="subcategory" name="subcategory" required></select>
-                        </div>
-
-                        <div class="form-group" id="modeGroup" style="display: none;">
-                            <label for="modeToggle">Mode</label>
-                            <select id="modeToggle" name="modeToggle">
-                                <option value="weight">weight</option>
-                                <option value="servings">servings</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="valueInput" id="inputLabel">Distance (km)</label>
-                            <input type="number" id="valueInput" name="valueInput" step="0.01" min="0.01" required placeholder="Enter km">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-full">Add Activity</button>
-                    </form>
-                </div>
-
-                <!-- Activity List -->
-                <div class="card list-card">
-                    <div class="card-heading">
-                        <h2 class="card-title">Recent Activities</h2>
-                    </div>
-                    <div class="activities-list" id="list">
-                        {% if activities %}
-                            {% for activity in activities %}
-                            <div class="activity-item">
-                                <div class="activity-info">
-                                    <span class="activity-category">{{ activity.category|title }}</span>
-                                    <span class="activity-type">{{ activity.activity_type|title }}</span>
-                                    <span class="activity-amount">{{ activity.amount }} {{ activity.unit }}</span>
-                                </div>
-                                <div class="activity-right">
-                                    <div class="activity-emission">
-                                        <span class="emission-value">{{ "%.4f"|format(activity.emission) }} kg CO₂</span>
-                                        <span class="activity-date">{{ activity.date }}</span>
-                                    </div>
-                                    <a href="{{ url_for('delete_activity', activity_id=activity.id) }}" class="btn-delete" onclick="return confirm('Delete this activity?')" title="Delete">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="no-activities">No activities logged yet. Add your first activity!</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Insights Section -->
-            <div class="insights-section">
-                <div class="section-heading">
-                    <h2 class="section-title">Insights</h2>
-                </div>
-                
-                {% if category_breakdown or weekly_data %}
-                <div class="insights-grid">
-                    {% if category_breakdown %}
-                    <div class="card insight-card">
-                        <div class="card-heading">
-                            <h3 class="insight-title">By Category</h3>
-                        </div>
-                        <div class="category-bars">
-                            {% for cat in category_breakdown %}
-                            <div class="category-bar-item">
-                                <div class="bar-label">
-                                    <span>{{ cat.category|title }}</span>
-                                    <span>{{ "%.4f"|format(cat.total) }} kg</span>
-                                </div>
-                                <div class="bar-track">
-                                    <div class="bar-fill" style="width: {{ (cat.total / total_emission * 100) if total_emission > 0 else 0 }}%"></div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if weekly_data %}
-                    <div class="card insight-card">
-                        <div class="card-heading">
-                            <h3 class="insight-title">Weekly Trend</h3>
-                        </div>
-                        <div class="weekly-bars">
-                            {% for day in weekly_data %}
-                            <div class="weekly-bar-item">
-                                <div class="weekly-bar" style="height: {{ (day.total / 1 * 100) if day.total > 0 else 5 }}%"></div>
-                                <span class="weekly-label">{{ day.date[5:] }}</span>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% else %}
-                    <div class="card insight-card">
-                        <p class="no-insights">Start logging activities to see insights!</p>
-                    </div>
-                {% endif %}
-            </div>
         </div>
-    </main>
+    </div>
+    <div class="dash-grid">
+        <div class="card">
+            <h3>Tips</h3>
+            <ul class="tips">
+                {% for tip in stats.tips %}<li>{{ tip }}</li>{% endfor %}
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Monthly goal</h3>
+            <form method="POST" action="{{ url_for('set_goal') }}" class="goal-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="field">
+                    <label for="monthly_goal">Goal (kg CO₂e per month)</label>
+                    <input type="number" id="monthly_goal" name="monthly_goal" min="1" step="any" value="{{ '%g'|format(stats.goal) if stats.goal }}" placeholder="e.g. {{ (stats.india_daily * 30)|round|int }}">
+                </div>
+                <button type="submit" class="btn btn-secondary">Save</button>
+            </form>
+            <p class="muted small">India's average works out to about {{ (stats.india_daily * 30)|round|int }} kg a month per person (all sources, not just personal activity).</p>
+        </div>
+    </div>
+</section>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+<script id="dashboard-data" type="application/json">{{ {"chart": stats.chart, "categories": categories, "grid": grid}|tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}
