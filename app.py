@@ -483,8 +483,10 @@ def healthz():
 
 
 if __name__ == "__main__":
+    debug = os.environ.get("FLASK_DEBUG") == "1"
+    # Keep the Werkzeug debugger off the network unless HOST says otherwise.
     app.run(
-        host="0.0.0.0",
+        host=os.environ.get("HOST", "127.0.0.1" if debug else "0.0.0.0"),
         port=int(os.environ.get("PORT", 5000)),
-        debug=os.environ.get("FLASK_DEBUG") == "1",
+        debug=debug,
     )
